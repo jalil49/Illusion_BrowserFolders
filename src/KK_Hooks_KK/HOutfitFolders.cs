@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using BepInEx.Harmony;
 using ChaCustom;
 using HarmonyLib;
 using KKAPI.Utilities;
-using Manager;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace BrowserFolders.Hooks.KK
 {
@@ -22,18 +19,12 @@ namespace BrowserFolders.Hooks.KK
         private static string _currentRelativeFolder;
         private static GameObject ht;
 
-
         public HOutfitFolders()
         {
             _folderTreeView = new FolderTreeView(Utils.NormalizePath(UserData.Path), Utils.NormalizePath(UserData.Path));
             _folderTreeView.CurrentFolderChanged = OnFolderChanged;
 
             Harmony.CreateAndPatchAll(typeof(HOutfitFolders));
-        }
-
-        private static string DirectoryPathModifier(string currentDirectoryPath)
-        {
-            return _folderTreeView != null ? _folderTreeView.CurrentFolder : currentDirectoryPath;
         }
 
         [HarmonyPrefix]
@@ -60,7 +51,6 @@ namespace BrowserFolders.Hooks.KK
                     instruction.opcode = OpCodes.Ldsfld;
                     instruction.operand = typeof(HOutfitFolders).GetField(nameof(_currentRelativeFolder), BindingFlags.NonPublic | BindingFlags.Static);
                 }
-
                 yield return instruction;
             }
         }

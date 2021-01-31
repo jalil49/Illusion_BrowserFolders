@@ -1,11 +1,8 @@
 ﻿using System.IO;
-using BepInEx.Harmony;
 using ChaCustom;
 using HarmonyLib;
 using KKAPI.Utilities;
-using Manager;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace BrowserFolders.Hooks.KKP
 {
@@ -24,11 +21,6 @@ namespace BrowserFolders.Hooks.KKP
             _folderTreeView.CurrentFolderChanged = OnFolderChanged;
 
             Harmony.CreateAndPatchAll(typeof(HOutfitFolders));
-        }
-
-        private static string DirectoryPathModifier(string currentDirectoryPath)
-        {
-            return _folderTreeView != null ? _folderTreeView.CurrentFolder : currentDirectoryPath;
         }
 
         [HarmonyPrefix]
