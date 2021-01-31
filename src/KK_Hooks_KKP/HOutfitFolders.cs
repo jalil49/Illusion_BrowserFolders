@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using BepInEx.Harmony;
 using ChaCustom;
 using HarmonyLib;
 using KKAPI.Utilities;
+using Manager;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,6 +62,8 @@ namespace BrowserFolders.Hooks.KKP
         private static void OnFolderChanged()
         {
             if (_customCoordinateFile == null) return;
+
+            // private bool Initialize()                
             Traverse.Create(_customCoordinateFile).Method("Initialize").GetValue();
         }
 
