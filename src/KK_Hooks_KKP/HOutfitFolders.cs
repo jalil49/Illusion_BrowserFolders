@@ -16,14 +16,19 @@ namespace BrowserFolders.Hooks.KKP
         private static FolderTreeView _folderTreeView;
 
         public static string CurrentRelativeFolder => _folderTreeView?.CurrentRelativeFolder;
-        private static bool _hToggle;//doesn't initialize to true at start or at least in "public HOutfitFolders()" as true as it crashes the game on startup
+        private static GameObject ht;
 
         public HOutfitFolders()
         {
             _folderTreeView = new FolderTreeView(Utils.NormalizePath(UserData.Path), Utils.NormalizePath(UserData.Path));
             _folderTreeView.CurrentFolderChanged = OnFolderChanged;
-            
+
             Harmony.CreateAndPatchAll(typeof(HOutfitFolders));
+        }
+
+        private static string DirectoryPathModifier(string currentDirectoryPath)
+        {
+            return _folderTreeView != null ? _folderTreeView.CurrentFolder : currentDirectoryPath;
         }
 
         [HarmonyPrefix]
@@ -34,22 +39,15 @@ namespace BrowserFolders.Hooks.KKP
             _folderTreeView.CurrentFolder = _folderTreeView.DefaultPath;
 
             _customCoordinateFile = __instance;
+            ht = GameObject.Find("Canvas/clothesFileWindow");
 
-            _hToggle = true; //weirdly enough required so file system would open the first time you use the preset per encounter 
-            GameObject.Find("Canvas/SubMenu/DressCategory/ClothChange").GetComponent<Button>().onClick.AddListener(EnablePreset);//guessing cause listener is added after first click and doesnt execute but the other two seem fine
-            GameObject.Find("Canvas/clothesFileWindow/Window/WinRect/Load/btnCancel").GetComponent<Button>().onClick.AddListener(DisablePreset);//maybe cause there are two disables
-            GameObject.Find("Canvas/clothesFileWindow/Window/BasePanel/MenuTitle/btnClose").GetComponent<Button>().onClick.AddListener(DisablePreset);
         }
 
         public void OnGui()
         {
             bool guiShown = false;
-            if (_hToggle)
+            if (ht != null && ht.activeSelf)
             {
-                if (Input.GetMouseButtonDown(1))//if right click close
-                {
-                    DisablePreset();
-                }
                 var screenRect = new Rect((int)(Screen.width * 0.004), (int)(Screen.height * 0.57f), (int)(Screen.width * 0.125), (int)(Screen.height * 0.35));
                 IMGUIUtils.DrawSolidBox(screenRect);
                 GUILayout.Window(36, screenRect, TreeWindow, "Select outfit folder");
@@ -97,15 +95,6 @@ namespace BrowserFolders.Hooks.KKP
                 GUILayout.EndVertical();
             }
             GUILayout.EndVertical();
-        }
-
-        private static void EnablePreset()//listen to preset button
-        {
-            _hToggle = true;
-        }
-        private static void DisablePreset()//exit if either close button is clicked or right click
-        {
-            _hToggle = false;
         }
     }
 }
